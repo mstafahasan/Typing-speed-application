@@ -5,7 +5,7 @@ import random
 
 # Sample sentences for the typing test
 SAMPLE_TEXTS = [
-    "The quick brown fox jumps over the lazy dog as we here .",
+    "The quick brown fox jumps over the lazy dog as we here.",
     "Python is an interpreted, high-level programming language.",
     "Typing fast and accurately is a valuable skill.",
     "Artificial intelligence will revolutionize technology.",
@@ -21,6 +21,7 @@ class TypingSpeedTestApp:
         
         self.sample_text = random.choice(SAMPLE_TEXTS)
         self.start_time = None
+        self.history = []  # To store history
 
         # Sample text display
         self.sample_text_label = tk.Label(root, text="Type the following text:", font=("Arial", 14), bg="#f0f0f0")
@@ -33,9 +34,12 @@ class TypingSpeedTestApp:
         self.input_text = tk.Text(root, height=5, width=60, font=("Arial", 12), wrap="word")
         self.input_text.pack(pady=10)
         
-        # Start/Submit button
+        # Buttons
         self.start_button = tk.Button(root, text="Start", command=self.start_test, font=("Arial", 12), bg="#4CAF50", fg="white", width=10)
         self.start_button.pack(pady=5)
+
+        self.history_button = tk.Button(root, text="Show History", command=self.show_history, font=("Arial", 12), bg="#2196F3", fg="white", width=12)
+        self.history_button.pack(pady=5)
 
         # Result display
         self.result_label = tk.Label(root, text="", font=("Arial", 14), bg="#f0f0f0")
@@ -78,9 +82,39 @@ class TypingSpeedTestApp:
         result_message = f"Time: {elapsed_time:.2f} seconds\nWPM: {wpm:.2f}\nAccuracy: {accuracy:.2f}%"
         self.result_label.config(text=result_message)
 
+        # Save results in history
+        self.history.append({
+            "text": self.sample_text,
+            "time": elapsed_time,
+            "wpm": wpm,
+            "accuracy": accuracy
+        })
+
         # Reset start button
         self.start_button.config(text="Start", command=self.start_test)
         self.start_time = None
+
+    def show_history(self):
+        # Create a new window for history
+        history_window = tk.Toplevel(self.root)
+        history_window.title("Typing History")
+        history_window.geometry("600x400")
+        history_window.config(bg="#f0f0f0")
+
+        # Display history
+        if not self.history:
+            tk.Label(history_window, text="No history available.", font=("Arial", 14), bg="#f0f0f0").pack(pady=20)
+        else:
+            for index, entry in enumerate(self.history, start=1):
+                history_text = (
+                    f"Test {index}:\n"
+                    f"Sample Text: {entry['text']}\n"
+                    f"Time: {entry['time']:.2f} seconds\n"
+                    f"WPM: {entry['wpm']:.2f}\n"
+                    f"Accuracy: {entry['accuracy']:.2f}%\n"
+                    f"{'-' * 40}"
+                )
+                tk.Label(history_window, text=history_text, font=("Arial", 12), bg="#f0f0f0", justify="left", anchor="w", wraplength=580).pack(pady=5)
 
 # Main application
 root = tk.Tk()
